@@ -831,7 +831,7 @@ function bindGate(){
         "Anmeldung fehlgeschlagen: " + m;
       return;
     }
-    S.mode = "db"; store = remoteStore(); startApp(); initPresence();
+    S.mode = "db"; store = remoteStore(); startApp(); initPresence(); migrateLocal();
   });
   $("#offlineBtn").onclick = ()=>{
     S.mode = "local"; store = localStore(); startApp();
@@ -876,6 +876,20 @@ function openMeMenu(){
   },0);
 }
 
+/* Lokal angelegte Strats einmalig ins Team-Buch heben, wenn dieses leer ist. */
+async function migrateLocal(){
+  const local = Object.values(LS.get("rr.strats", {}));
+  if(!local.length || S.mode !== "db") return;
+  try{
+    const { data, error } = await sb.from("strats").select("id").limit(1);
+    if(error || (data && data.length)) return;   // Datenbank nicht leer: nichts anfassen
+    for(const s of local) await store.saveStrat(s);
+    toast(local.length + (local.length === 1
+      ? " Strat von diesem Ger\u00e4t ins Team-Buch \u00fcbernommen."
+      : " Strats von diesem Ger\u00e4t ins Team-Buch \u00fcbernommen."));
+  }catch(e){ /* beim n\u00e4chsten Anmelden nochmal */ }
+}
+
 /* ===================== Start ===================== */
 function boot(){
   $("#meLabel").textContent = ME || "Ich";
@@ -908,7 +922,7 @@ async function main(){
   });
   const { data } = await sb.auth.getSession();
   if(data && data.session){
-    S.mode = "db"; store = remoteStore(); startApp(); initPresence();
+    S.mode = "db"; store = remoteStore(); startApp(); initPresence(); migrateLocal();
   } else {
     showGate();
   }
