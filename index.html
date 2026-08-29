@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar Room — CS2 Stratbook</title>
+<meta name="description" content="Stratbook für CS2: alle Active-Duty-Maps, Zeichnen auf dem Radar, Utility, Aufstellungen und Ablauf. Für das ganze Team, live synchron.">
+<meta name="theme-color" content="#0C1015">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <form class="gatecard" id="gateForm">
+    <div class="brand"><b>Radar<span style="opacity:.45">/</span>Room</b></div>
+    <p id="gateIntro">Mit dem Team-Zugang anmelden. Einmal pro Gerät, danach bleibst du eingeloggt.</p>
+    <label><span class="eyebrow">E-Mail</span>
+      <input class="field" type="email" id="gateMail" autocomplete="username" required></label>
+    <label><span class="eyebrow">Passwort</span>
+      <input class="field" type="password" id="gatePass" autocomplete="current-password" required></label>
+    <div class="gateerr" id="gateErr"></div>
+    <button class="btn primary" type="submit" id="gateBtn" style="height:36px">Anmelden</button>
+    <div class="gatefoot" id="gateFoot">
+      Kein Zugang? Frag den, der das Stratbook eingerichtet hat.
+      <button type="button" id="offlineBtn">Ohne Anmeldung nur auf diesem Gerät arbeiten</button>
+    </div>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+  <header class="topbar">
+    <div class="brand"><b>Radar<span style="opacity:.45">/</span>Room</b><span class="tag-line">CS2 STRATBOOK</span></div>
+    <input class="teamname" id="teamName" value="Team" maxlength="22" aria-label="Teamname" spellcheck="false">
+    <div style="flex:1"></div>
+    <div class="pill hide-s" id="presence" title="Gerade im Stratbook"><span class="who" id="whoList"></span><span id="whoText">nur du</span></div>
+    <button class="btn ghost sm" id="installBtn" hidden title="Als App installieren">Installieren</button>
+    <button class="pill" id="meBtn" title="Dein Anzeigename">
+      <span class="dot" id="syncDot"></span><span class="meBtn-label" id="meLabel">Ich</span>
+    </button>
+    <button class="btn sm" id="presetBtn" title="Vorschläge">Presets</button>
+  </header>
+
+  <div class="main" data-pane="stage" id="mainGrid">
+
+    <aside class="rail">
+      <div class="sideswitch">
+        <button id="sideT" aria-pressed="true">T<em>-Side</em></button>
+        <button id="sideCT" aria-pressed="false">CT<em>-Side</em></button>
+      </div>
+      <div class="railsec"><span class="eyebrow">Active Duty</span><span class="eyebrow">Season 5</span></div>
+      <div class="maplist" id="mapList"></div>
+      <div class="stratwrap">
+        <div class="railsec">
+          <span class="eyebrow" id="stratHead">Strats</span>
+          <button class="btn primary sm" id="newStrat">+ Neu</button>
+        </div>
+        <div class="stratlist" id="stratList"></div>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <div class="stagebar">
+        <div class="chips" id="layerChips"></div>
+        <div class="chips" id="phaseChips">
+          <button data-ph="0" aria-pressed="true">ALLE</button>
+          <button data-ph="1">1</button><button data-ph="2">2</button><button data-ph="3">3</button>
+        </div>
+        <div style="flex:1"></div>
+        <div class="chips" id="zoomChips">
+          <button data-z="out" aria-label="Kleiner">–</button><button data-z="fit" aria-pressed="true">FIT</button><button data-z="in" aria-label="Größer">+</button>
+        </div>
+        <button class="btn ghost sm" id="undoBtn" title="Rückgängig (Strg+Z)">Undo</button>
+        <button class="btn ghost sm danger" id="clearBtn">Leeren</button>
+      </div>
+      <div class="stagerow">
+        <div class="toolbar" id="toolbar"></div>
+        <div class="board" id="board">
+          <div class="canvaswrap" id="canvasWrap">
+            <img class="radar" id="radarImg" alt="">
+            <svg class="draw" id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+          <div class="stagehint" id="hint"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="inspector">
+      <div class="insp" id="insp"></div>
+      <div class="meta"><span id="metaSaved">–</span><span class="mono" id="metaId"></span></div>
+    </aside>
+  </div>
+
+  <nav class="mobtabs" id="mobTabs">
+    <button data-pane="rail"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Strats</button>
+    <button data-pane="stage" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/></svg>Map</button>
+    <button data-pane="insp"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 9h8M8 13h8M8 17h5"/></svg>Setup</button>
+  </nav>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="scrim" data-close></div>
+  <div class="sheet">
+    <div class="sheethead">
+      <h2>Vorschläge <span class="eyebrow" id="presetMap"></span></h2>
+      <button class="btn ghost sm" data-close>Schließen</button>
+    </div>
+    <div class="sheetbody" id="presetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/vendor/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="data/maps.js"></script>
+<script src="data/presets.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
