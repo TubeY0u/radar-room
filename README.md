@@ -38,6 +38,20 @@ den Link öffnen und sich einmal anmelden.
 Wenn du lieber einen Account pro Spieler willst: einfach fünf Nutzer anlegen.
 Die App funktioniert mit beidem, ohne Änderung am Code.
 
+### 2b. Selbstregistrierung abschalten — nicht überspringen
+
+Standardmäßig darf sich bei Supabase jeder selbst einen Account anlegen. Da die
+Zugriffsregeln jedem angemeldeten Nutzer alles erlauben, könnte sich sonst ein
+Fremder registrieren und euer Stratbook lesen und ändern. Das gilt besonders,
+wenn der Code öffentlich auf GitHub liegt, denn dann ist die Projekt-URL
+auffindbar.
+
+1. Links auf **Authentication**, dann **Sign In / Providers**, dann **Email**.
+2. **Allow new users to sign up** ausschalten und speichern.
+
+Ab da kommen nur noch die Accounts rein, die du selbst angelegt hast. Neue
+Mitspieler legst du weiter über **Authentication → Users → Add user** an.
+
 ### 3. Schlüssel eintragen
 
 1. Links auf **Project Settings**, dann **API**.
@@ -57,13 +71,29 @@ Schritt 1.
 
 ### 4. Online stellen (GitHub Pages)
 
+GitHub Pages funktioniert auf dem kostenlosen Plan nur bei einem öffentlichen
+Repository. Das ist unkritisch: öffentlich ist der Code, nicht die Daten. Der
+anon-Key ist genau dafür gedacht, im Browser zu stehen, und ohne Anmeldung
+kommt niemand an die Strats. Vorausgesetzt, Schritt 1 und 2b sind erledigt.
+
+Was **niemals** ins Repo gehört: der **service_role**-Key aus den API-
+Einstellungen. Der hebelt alle Zugriffsregeln aus. In `config.js` gehört
+ausschließlich der **anon public** Key.
+
 1. Neues Repository auf GitHub anlegen, zum Beispiel `radar-room`.
 2. Den kompletten Inhalt dieses Ordners reinladen, entweder per
    `git push` oder über **Add file → Upload files** im Browser.
-3. Im Repo auf **Settings → Pages**, unter *Source* **Deploy from a branch**
+3. Repo öffentlich schalten: **Settings → General**, ganz nach unten in die
+   *Danger Zone*, **Change repository visibility → Change to public**,
+   Repo-Namen zur Bestätigung eintippen.
+4. Im Repo auf **Settings → Pages**, unter *Source* **Deploy from a branch**
    wählen, Branch `main` und Ordner `/ (root)`, dann **Save**.
-4. Nach ein bis zwei Minuten liegt die Seite unter
+5. Nach ein bis zwei Minuten liegt die Seite unter
    `https://DEINNAME.github.io/radar-room/`.
+
+**Kurzer Test danach:** die Seite in einem privaten Fenster öffnen. Du musst
+den Login-Screen sehen und ohne Zugangsdaten nicht weiterkommen. Falls doch
+Strats auftauchen, ist das SQL aus Schritt 1 nicht durchgelaufen.
 
 Eigene Domain, etwa `stratbook.voidcrafts.de`: im Repo unter **Settings → Pages
 → Custom domain** eintragen und beim Domain-Anbieter einen CNAME auf
@@ -126,15 +156,20 @@ Block raus, den du direkt ins Discord pasten kannst.
 
 ## Was wo liegt
 
+Alle Dateien liegen flach in einem Ordner, ganz bewusst: so lässt sich der
+komplette Satz in einem Rutsch bei GitHub hochladen, ohne dass Unterordner
+verloren gehen.
+
 ```
 index.html              Aufbau der Seite
 app.css                 Gestaltung
 app.js                  Logik: Zeichnen, Speichern, Anmeldung, Sync
 config.js               deine Supabase-Zugangsdaten
-data/maps.js            Maps mit Größe und Bildpfad
-data/presets.js         die 26 Vorschlag-Strats
-assets/radars/*.webp    Radar-Overviews aus den Spieldateien
-assets/vendor/          Supabase-Bibliothek, lokal statt aus dem Netz
+maps.js                 Maps mit Größe und Bildpfad
+presets.js              die 26 Vorschlag-Strats
+de_*.webp               Radar-Overviews aus den Spieldateien
+supabase.min.js         Supabase-Bibliothek, lokal statt aus dem Netz
+icon-*.png              App-Icons
 sw.js                   Offline-Cache
 manifest.webmanifest    macht die Seite installierbar
 supabase-schema.sql     Datenbank-Aufbau
@@ -146,8 +181,8 @@ solltest du das anders lösen.
 
 ## Eigene Strats ergänzen
 
-Die Presets in `data/presets.js` sind reiner Text, da kannst du gefahrlos
+Die Presets in `presets.js` sind reiner Text, da kannst du gefahrlos
 eigene ergänzen. Aufbau pro Eintrag: `name`, `side` (`"T"` oder `"CT"`),
 `tags`, `roles` (fünf Rollen), `steps` (Ablauf) und `util`
-(Paare aus Sorte und Spot). Neue Map ergänzen geht in `data/maps.js`, dazu das
-Radar-Bild nach `assets/radars/` legen und Breite und Höhe eintragen.
+(Paare aus Sorte und Spot). Neue Map ergänzen geht in `maps.js`, dazu das
+Radar-Bild in denselben Ordner legen und Breite und Höhe eintragen.

@@ -3,13 +3,11 @@
    Bilder und Schriften: erst Cache (die ändern sich nie).            */
 const VERSION = "rr-v1";
 const SHELL = [
-  "./", "./index.html", "./app.css", "./app.js",
-  "./config.js", "./data/maps.js", "./data/presets.js",
-  "./manifest.webmanifest", "./sw.js", "./assets/vendor/supabase.min.js", "./assets/icon-192.png", "./assets/icon-512.png",
-  "./assets/radars/de_dust2.webp", "./assets/radars/de_mirage.webp",
-  "./assets/radars/de_inferno.webp", "./assets/radars/de_nuke.webp",
-  "./assets/radars/de_nuke_lower.webp", "./assets/radars/de_ancient.webp",
-  "./assets/radars/de_anubis.webp", "./assets/radars/de_cache.webp"
+  "./", "./index.html", "./app.css", "./app.js", "./sw.js",
+  "./config.js", "./maps.js", "./presets.js", "./supabase.min.js",
+  "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-180.png",
+  "./de_dust2.webp", "./de_mirage.webp", "./de_inferno.webp", "./de_nuke.webp",
+  "./de_nuke_lower.webp", "./de_ancient.webp", "./de_anubis.webp", "./de_cache.webp"
 ];
 
 self.addEventListener("install", e=>{

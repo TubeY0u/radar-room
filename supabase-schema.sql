@@ -44,6 +44,14 @@ create policy "team schreibt strats" on public.strats for all    to authenticate
 create policy "team liest meta"      on public.meta   for select to authenticated using (true);
 create policy "team schreibt meta"   on public.meta   for all    to authenticated using (true) with check (true);
 
+-- ===================================================================
+-- WICHTIG, nicht per SQL machbar:
+-- Danach im Dashboard unter Authentication -> Sign In / Providers -> Email
+-- die Option "Allow new users to sign up" AUSSCHALTEN.
+-- Sonst kann sich jeder selbst einen Account anlegen und damit alles
+-- lesen und ändern, was hier für "authenticated" freigegeben ist.
+-- ===================================================================
+
 -- --- Live-Sync einschalten ------------------------------------------
 alter publication supabase_realtime add table public.strats;
 alter publication supabase_realtime add table public.meta;
